@@ -1,0 +1,209 @@
+/* style.css */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 20px;
+}
+
+/* ── Setup Panel ── */
+#setup {
+  display: inline-block;
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 24px 36px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+#setup h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #333;
+}
+
+.setup-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.setup-row label {
+  min-width: 150px;
+  font-weight: bold;
+  color: #444;
+}
+
+.setup-row input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  width: 160px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.setup-row input[type="text"]:focus {
+  border-color: #2196F3;
+}
+
+/* ── Grid Size Buttons ── */
+#size-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.size-btn {
+  padding: 6px 12px;
+  border: 2px solid #aaa;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.size-btn:hover {
+  border-color: #555;
+  background: #f0f0f0;
+}
+
+.size-btn.active {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+
+/* ── Coin Toss ── */
+#toss-btn {
+  padding: 7px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  background: #fff8e1;
+  transition: background 0.15s;
+}
+
+#toss-btn:hover {
+  background: #fff3cd;
+}
+
+#toss-result {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+#toss-result.toss-p1 {
+  color: steelblue;
+  animation: popIn 0.4s ease;
+}
+
+#toss-result.toss-p2 {
+  color: seagreen;
+  animation: popIn 0.4s ease;
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.6); }
+  70%  { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Start Button ── */
+#start-btn {
+  display: block;
+  margin: 22px auto 0;
+  padding: 10px 32px;
+  font-size: 16px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#start-btn:hover {
+  background: #1976D2;
+}
+
+/* ── Game Area ── */
+#score-display {
+  font-size: 17px;
+}
+
+.p1-label {
+  color: steelblue;
+  font-weight: bold;
+}
+
+.p2-label {
+  color: seagreen;
+  font-weight: bold;
+}
+
+#current-player-name {
+  font-weight: bold;
+}
+
+/* ── Board ── */
+#game-board {
+  display: grid;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 15px;
+  height: 15px;
+  background: black;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.line {
+  background: lightgray;
+  cursor: pointer;
+}
+
+.line.horizontal {
+  width: 60px;
+  height: 15px;
+}
+
+.line.vertical {
+  width: 15px;
+  height: 60px;
+}
+
+.line.clicked {
+  background: black;
+  cursor: default;
+}
+
+.box {
+  width: 60px;
+  height: 60px;
+  background: white;
+}
+
+.box.player1 { background: lightblue; }
+.box.player2 { background: lightgreen; }
+
+/* ── Reset Button ── */
+#reset-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  transition: background 0.15s;
+}
+
+#reset-btn:hover {
+  background: #f0f0f0;
+}
