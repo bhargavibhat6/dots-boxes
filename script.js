@@ -6,61 +6,78 @@ const p1LabelEl = document.getElementById('p1-label');
 const p2LabelEl = document.getElementById('p2-label');
 const currentPlayerNameEl = document.getElementById('current-player-name');
 const resetBtn = document.getElementById('reset-btn');
-const startBtn = document.getElementById('start-btn');
 const tossBtn = document.getElementById('toss-btn');
 const tossResultEl = document.getElementById('toss-result');
-const setupEl = document.getElementById('setup');
-const gameAreaEl = document.getElementById('game-area');
 const name1Input = document.getElementById('name1');
 const name2Input = document.getElementById('name2');
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const settingsPanel = document.getElementById('settings-panel');
+const overlay = document.getElementById('overlay');
+const rowsInput = document.getElementById('rows-input');
+const colsInput = document.getElementById('cols-input');
+const rowsHint = document.getElementById('rows-hint');
+const colsHint = document.getElementById('cols-hint');
 
-let size = 3;
+let rows = 6;
+let cols = 6;
 let currentPlayer = 1;
 let scores = { 1: 0, 2: 0 };
-let totalBoxes = size * size;
+let totalBoxes = rows * cols;
 let aiTimeout = null;
 let cellMap = new Map();
-let playerNames = { 1: 'Player 1', 2: 'AI' };
+let playerNames = { 1: 'Player 1', 2: 'Bot' };
 let firstPlayer = 1;
 
-// Grid size selection
-document.querySelectorAll('.size-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    size = parseInt(btn.dataset.size);
-  });
+// Hamburger menu
+hamburgerBtn.addEventListener('click', () => {
+  settingsPanel.classList.add('open');
+  overlay.classList.add('visible');
 });
+
+overlay.addEventListener('click', () => {
+  settingsPanel.classList.remove('open');
+  overlay.classList.remove('visible');
+});
+
+// Grid dimension inputs
+function bindGridInput(input, hint, setter) {
+  input.addEventListener('input', () => {
+    const val = parseInt(input.value);
+    const valid = val >= 2 && val <= 20;
+    input.classList.toggle('error', !!input.value && !valid);
+    hint.classList.toggle('visible', !!input.value && !valid);
+    if (valid) setter(val);
+  });
+}
+
+bindGridInput(rowsInput, rowsHint, val => { rows = val; });
+bindGridInput(colsInput, colsHint, val => { cols = val; });
 
 // Coin toss
 tossBtn.addEventListener('click', () => {
   const p1Name = name1Input.value.trim() || 'Player 1';
-  const p2Name = name2Input.value.trim() || 'AI';
+  const p2Name = name2Input.value.trim() || 'Bot';
   firstPlayer = Math.random() < 0.5 ? 1 : 2;
   const winnerName = firstPlayer === 1 ? p1Name : p2Name;
   const coinSide = Math.random() < 0.5 ? 'Heads' : 'Tails';
 
-  // Restart animation by resetting class
   tossResultEl.className = '';
-  void tossResultEl.offsetWidth; // force reflow
+  void tossResultEl.offsetWidth;
   tossResultEl.textContent = `${coinSide}! ${winnerName} goes first!`;
   tossResultEl.className = firstPlayer === 1 ? 'toss-p1' : 'toss-p2';
+
+  startGame();
 });
 
-// Start game
-startBtn.addEventListener('click', () => {
-  playerNames[1] = name1Input.value.trim() || 'Player 1';
-  playerNames[2] = name2Input.value.trim() || 'AI';
-  p1LabelEl.textContent = playerNames[1];
-  p2LabelEl.textContent = playerNames[2];
-  totalBoxes = size * size;
-  setupEl.style.display = 'none';
-  gameAreaEl.style.display = 'block';
+// Quick restart with current settings
+resetBtn.addEventListener('click', () => {
+  clearTimeout(aiTimeout);
   startGame();
 });
 
 function startGame() {
   clearTimeout(aiTimeout);
+  totalBoxes = rows * cols;
   scores = { 1: 0, 2: 0 };
   currentPlayer = firstPlayer;
   score1El.textContent = 0;
@@ -75,32 +92,39 @@ function startGame() {
 function createBoard() {
   board.innerHTML = '';
   cellMap = new Map();
-  board.style.gridTemplateColumns = `repeat(${size * 2 + 1}, auto)`;
+  board.style.gridTemplateColumns = `repeat(${cols * 2 + 1}, auto)`;
 
-  for (let r = 0; r < size * 2 + 1; r++) {
-    for (let c = 0; c < size * 2 + 1; c++) {
-      const cell = document.createElement('div');
+  const cellW = Math.min(60, Math.floor(650 / (cols + (cols + 1) / 4)));
+  const cellH = Math.min(60, Math.floor(600 / (rows + (rows + 1) / 4)));
+  const dot   = Math.max(8, Math.round(Math.min(cellW, cellH) / 4));
+  board.style.setProperty('--cell-w', `${cellW}px`);
+  board.style.setProperty('--cell-h', `${cellH}px`);
+  board.style.setProperty('--dot', `${dot}px`);
+
+  for (let r = 0; r < rows * 2 + 1; r++) {
+    for (let c = 0; c < cols * 2 + 1; c++) {
+      const el = document.createElement('div');
 
       if (r % 2 === 0 && c % 2 === 0) {
-        cell.classList.add('dot');
+        el.classList.add('dot');
       } else if (r % 2 === 0) {
-        cell.classList.add('line', 'horizontal');
-        cell.dataset.type = 'h';
-        cell.dataset.row = r;
-        cell.dataset.col = c;
+        el.classList.add('line', 'horizontal');
+        el.dataset.type = 'h';
+        el.dataset.row = r;
+        el.dataset.col = c;
       } else if (c % 2 === 0) {
-        cell.classList.add('line', 'vertical');
-        cell.dataset.type = 'v';
-        cell.dataset.row = r;
-        cell.dataset.col = c;
+        el.classList.add('line', 'vertical');
+        el.dataset.type = 'v';
+        el.dataset.row = r;
+        el.dataset.col = c;
       } else {
-        cell.classList.add('box');
-        cell.dataset.row = r;
-        cell.dataset.col = c;
+        el.classList.add('box');
+        el.dataset.row = r;
+        el.dataset.col = c;
       }
 
-      cellMap.set(`${r},${c}`, cell);
-      board.appendChild(cell);
+      cellMap.set(`${r},${c}`, el);
+      board.appendChild(el);
     }
   }
 }
@@ -176,12 +200,5 @@ function aiMove() {
   endTurn();
 }
 
-// New Game → back to setup
-resetBtn.addEventListener('click', () => {
-  clearTimeout(aiTimeout);
-  firstPlayer = 1;
-  tossResultEl.textContent = '';
-  tossResultEl.className = '';
-  gameAreaEl.style.display = 'none';
-  setupEl.style.display = '';
-});
+// Start on load
+startGame();

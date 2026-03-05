@@ -7,44 +7,47 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Dots and Boxes</h1>
 
-  <div id="setup">
-    <h2>Game Setup</h2>
+  <button id="hamburger-btn" title="Settings">&#9881;</button>
+  <div id="overlay"></div>
+
+  <div id="settings-panel">
+    <h2>Settings</h2>
     <div class="setup-row">
-      <label>Player 1 Name:</label>
+      <label>Player 1:</label>
       <input type="text" id="name1" value="Player 1" maxlength="20">
     </div>
     <div class="setup-row">
-      <label>Player 2 (AI) Name:</label>
-      <input type="text" id="name2" value="AI" maxlength="20">
+      <label>Player 2 (Bot):</label>
+      <input type="text" id="name2" value="Bot" maxlength="20">
     </div>
     <div class="setup-row">
-      <label>Grid Size:</label>
-      <div id="size-buttons">
-        <button class="size-btn" data-size="2">2×2</button>
-        <button class="size-btn active" data-size="3">3×3</button>
-        <button class="size-btn" data-size="4">4×4</button>
-        <button class="size-btn" data-size="5">5×5</button>
-        <button class="size-btn" data-size="6">6×6</button>
-      </div>
+      <label>Rows:</label>
+      <input type="number" id="rows-input" class="grid-input" min="2" max="20" value="6" placeholder="2–20">
+      <span class="grid-hint" id="rows-hint">Enter a value between 2 and 20</span>
     </div>
     <div class="setup-row">
-      <button id="toss-btn">🪙 Coin Toss</button>
-      <span id="toss-result"></span>
+      <label>Columns:</label>
+      <input type="number" id="cols-input" class="grid-input" min="2" max="20" value="6" placeholder="2–20">
+      <span class="grid-hint" id="cols-hint">Enter a value between 2 and 20</span>
     </div>
-    <button id="start-btn">Start Game</button>
   </div>
 
-  <div id="game-area" style="display:none">
+  <h1>Dots and Boxes</h1>
+
+  <div id="game-area">
     <p id="score-display">
       <span id="p1-label" class="p1-label">Player 1</span>: <span id="score1">0</span>
       &nbsp;|&nbsp;
-      <span id="p2-label" class="p2-label">AI</span>: <span id="score2">0</span>
+      <span id="p2-label" class="p2-label">Bot</span>: <span id="score2">0</span>
     </p>
     <p>Current Turn: <span id="current-player-name"></span></p>
     <div id="game-board"></div>
-    <button id="reset-btn">New Game</button>
+    <div id="action-row">
+      <button id="toss-btn">&#x1FA99; Coin Toss</button>
+      <button id="reset-btn">New Game</button>
+    </div>
+    <div id="toss-result"></div>
   </div>
 
   <script src="gameLogic.js"></script>

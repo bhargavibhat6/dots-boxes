@@ -5,22 +5,65 @@ body {
   margin: 20px;
 }
 
-/* ── Setup Panel ── */
-#setup {
-  display: inline-block;
-  background: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 24px 36px;
-  margin: 20px auto;
+/* ── Hamburger Button ── */
+#hamburger-btn {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 101;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+#hamburger-btn:hover {
+  background: #eee;
+}
+
+/* ── Overlay ── */
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 99;
+}
+
+#overlay.visible {
+  display: block;
+}
+
+/* ── Settings Panel ── */
+#settings-panel {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: right 0.25s ease;
   text-align: left;
 }
 
-#setup h2 {
+#settings-panel.open {
+  right: 0;
+}
+
+#settings-panel h2 {
   margin-top: 0;
-  text-align: center;
+  font-size: 18px;
   color: #333;
 }
+
 
 .setup-row {
   display: flex;
@@ -49,31 +92,34 @@ body {
   border-color: #2196F3;
 }
 
-/* ── Grid Size Buttons ── */
-#size-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.size-btn {
-  padding: 6px 12px;
-  border: 2px solid #aaa;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
+/* ── Grid Dimension Inputs ── */
+.grid-input {
+  width: 70px;
+  padding: 6px 8px;
   font-size: 14px;
-  transition: all 0.15s;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.15s;
 }
 
-.size-btn:hover {
-  border-color: #555;
-  background: #f0f0f0;
+.grid-input:focus {
+  border-color: #2196F3;
 }
 
-.size-btn.active {
-  background: #333;
-  color: white;
-  border-color: #333;
+.grid-input.error {
+  border-color: #e53935;
+  background: #fff5f5;
+}
+
+.grid-hint {
+  font-size: 12px;
+  color: #e53935;
+  display: none;
+}
+
+.grid-hint.visible {
+  display: inline;
 }
 
 /* ── Coin Toss ── */
@@ -112,22 +158,19 @@ body {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* ── Start Button ── */
-#start-btn {
-  display: block;
-  margin: 22px auto 0;
-  padding: 10px 32px;
-  font-size: 16px;
-  background: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s;
+
+/* ── Action Row ── */
+#action-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
 }
 
-#start-btn:hover {
-  background: #1976D2;
+#toss-result {
+  margin-top: 8px;
+  min-height: 1.4em;
+  font-size: 15px;
 }
 
 /* ── Game Area ── */
@@ -157,8 +200,8 @@ body {
 }
 
 .dot {
-  width: 15px;
-  height: 15px;
+  width: var(--dot);
+  height: var(--dot);
   background: black;
   border-radius: 50%;
   margin: auto;
@@ -170,13 +213,13 @@ body {
 }
 
 .line.horizontal {
-  width: 60px;
-  height: 15px;
+  width: var(--cell-w);
+  height: var(--dot);
 }
 
 .line.vertical {
-  width: 15px;
-  height: 60px;
+  width: var(--dot);
+  height: var(--cell-h);
 }
 
 .line.clicked {
@@ -185,8 +228,8 @@ body {
 }
 
 .box {
-  width: 60px;
-  height: 60px;
+  width: var(--cell-w);
+  height: var(--cell-h);
   background: white;
 }
 
@@ -195,7 +238,7 @@ body {
 
 /* ── Reset Button ── */
 #reset-btn {
-  margin-top: 20px;
+  margin-top: 0;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
