@@ -94,8 +94,10 @@ function createBoard() {
   cellMap = new Map();
   board.style.gridTemplateColumns = `repeat(${cols * 2 + 1}, auto)`;
 
-  const cellW = Math.min(60, Math.floor(650 / (cols + (cols + 1) / 4)));
-  const cellH = Math.min(60, Math.floor(600 / (rows + (rows + 1) / 4)));
+  const availW = window.innerWidth - 40;
+  const availH = window.innerHeight - 220;
+  const cellW = Math.min(60, Math.floor(availW / (cols + (cols + 1) / 4)));
+  const cellH = Math.min(60, Math.floor(availH / (rows + (rows + 1) / 4)));
   const dot   = Math.max(8, Math.round(Math.min(cellW, cellH) / 4));
   board.style.setProperty('--cell-w', `${cellW}px`);
   board.style.setProperty('--cell-h', `${cellH}px`);
@@ -200,5 +202,39 @@ function aiMove() {
   endTurn();
 }
 
+// PWA install prompt
+const installBtn = document.getElementById('install-btn');
+const installIos = document.getElementById('install-ios');
+let deferredInstallPrompt = null;
+
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+
+if (isIos && !isInStandaloneMode) {
+  installIos.style.display = 'block';
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.style.display = 'block';
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') installBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  installBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+
 // Start on load
 startGame();
+
+// Redraw board on orientation change / resize
+window.addEventListener('resize', () => createBoard());
