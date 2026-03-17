@@ -11,12 +11,21 @@ const tossResultEl = document.getElementById('toss-result');
 const name1Input = document.getElementById('name1');
 const name2Input = document.getElementById('name2');
 const hamburgerBtn = document.getElementById('hamburger-btn');
-const settingsPanel = document.getElementById('settings-panel');
-const overlay = document.getElementById('overlay');
+const settingsModal = document.getElementById('settings-modal');
+const settingsCloseBtn = document.getElementById('settings-close-btn');
+const settingsApplyBtn = document.getElementById('settings-apply-btn');
 const rowsInput = document.getElementById('rows-input');
 const colsInput = document.getElementById('cols-input');
 const rowsHint = document.getElementById('rows-hint');
 const colsHint = document.getElementById('cols-hint');
+const p1Card = document.getElementById('p1-card');
+const p2Card = document.getElementById('p2-card');
+const gameArea = document.getElementById('game-area');
+const gameOverModal = document.getElementById('game-over-modal');
+const gameOverIcon = document.getElementById('game-over-icon');
+const gameOverTitle = document.getElementById('game-over-title');
+const gameOverScores = document.getElementById('game-over-scores');
+const gameOverBtn = document.getElementById('game-over-btn');
 
 let rows = 6;
 let cols = 6;
@@ -28,15 +37,59 @@ let cellMap = new Map();
 let playerNames = { 1: 'Player 1', 2: 'Bot' };
 let firstPlayer = 1;
 
-// Hamburger menu
-hamburgerBtn.addEventListener('click', () => {
-  settingsPanel.classList.add('open');
-  overlay.classList.add('visible');
+function applySettings() {
+  playerNames[1] = name1Input.value.trim() || 'Player 1';
+  playerNames[2] = name2Input.value.trim() || 'Bot';
+  p1LabelEl.textContent = playerNames[1];
+  p2LabelEl.textContent = playerNames[2];
+}
+
+function updateTurnUI() {
+  const isP1 = currentPlayer === 1;
+  currentPlayerNameEl.textContent = playerNames[currentPlayer];
+  currentPlayerNameEl.className = `turn-name turn-p${currentPlayer}`;
+  p1Card.classList.toggle('active', isP1);
+  p2Card.classList.toggle('active', !isP1);
+  gameArea.classList.toggle('turn-p1', isP1);
+  gameArea.classList.toggle('turn-p2', !isP1);
+}
+
+function showGameOver() {
+  const isDraw = scores[1] === scores[2];
+  const winnerIdx = scores[1] > scores[2] ? 1 : 2;
+  const winnerName = isDraw ? null : playerNames[winnerIdx];
+
+  gameOverIcon.textContent = isDraw ? '🤝' : '🏆';
+  gameOverTitle.textContent = isDraw ? "It's a Draw!" : `${winnerName} Wins!`;
+  gameOverScores.innerHTML =
+    `<strong style="color:var(--p1)">${playerNames[1]}</strong>: ${scores[1]} &nbsp;·&nbsp; ` +
+    `<strong style="color:var(--p2)">${playerNames[2]}</strong>: ${scores[2]}`;
+
+  if (!isDraw) {
+    gameOverTitle.style.color = winnerIdx === 1 ? 'var(--p1)' : 'var(--p2)';
+  } else {
+    gameOverTitle.style.color = '';
+  }
+
+  gameOverModal.classList.add('visible');
+}
+
+gameOverBtn.addEventListener('click', () => {
+  gameOverModal.classList.remove('visible');
+  startGame();
 });
 
-overlay.addEventListener('click', () => {
-  settingsPanel.classList.remove('open');
-  overlay.classList.remove('visible');
+// Settings modal
+hamburgerBtn.addEventListener('click', () => settingsModal.classList.add('visible'));
+settingsCloseBtn.addEventListener('click', () => settingsModal.classList.remove('visible'));
+settingsModal.addEventListener('click', e => {
+  if (e.target === settingsModal) settingsModal.classList.remove('visible');
+});
+settingsApplyBtn.addEventListener('click', () => {
+  applySettings();
+  settingsModal.classList.remove('visible');
+  clearTimeout(aiTimeout);
+  startGame();
 });
 
 // Grid dimension inputs
@@ -55,10 +108,9 @@ bindGridInput(colsInput, colsHint, val => { cols = val; });
 
 // Coin toss
 tossBtn.addEventListener('click', () => {
-  const p1Name = name1Input.value.trim() || 'Player 1';
-  const p2Name = name2Input.value.trim() || 'Bot';
+  applySettings();
   firstPlayer = Math.random() < 0.5 ? 1 : 2;
-  const winnerName = firstPlayer === 1 ? p1Name : p2Name;
+  const winnerName = playerNames[firstPlayer];
   const coinSide = Math.random() < 0.5 ? 'Heads' : 'Tails';
 
   tossResultEl.className = '';
@@ -82,7 +134,7 @@ function startGame() {
   currentPlayer = firstPlayer;
   score1El.textContent = 0;
   score2El.textContent = 0;
-  currentPlayerNameEl.textContent = playerNames[currentPlayer];
+  updateTurnUI();
   createBoard();
   if (currentPlayer === 2) {
     aiTimeout = setTimeout(aiMove, 500);
@@ -149,14 +201,10 @@ function endTurn() {
   if (!boxCompleted) {
     currentPlayer = currentPlayer === 1 ? 2 : 1;
   }
-  currentPlayerNameEl.textContent = playerNames[currentPlayer];
+  updateTurnUI();
 
   if (scores[1] + scores[2] === totalBoxes) {
-    let winner;
-    if (scores[1] > scores[2]) winner = playerNames[1];
-    else if (scores[2] > scores[1]) winner = playerNames[2];
-    else winner = 'Nobody (Draw)';
-    setTimeout(() => alert(`Game Over! Winner: ${winner}`), 100);
+    setTimeout(showGameOver, 300);
     return;
   }
 
@@ -234,6 +282,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 // Start on load
+applySettings();
 startGame();
 
 // Redraw board on orientation change / resize
