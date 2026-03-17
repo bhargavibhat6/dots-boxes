@@ -27,8 +27,8 @@ const gameOverTitle = document.getElementById('game-over-title');
 const gameOverScores = document.getElementById('game-over-scores');
 const gameOverBtn = document.getElementById('game-over-btn');
 
-let rows = 6;
-let cols = 6;
+let rows = 4;
+let cols = 4;
 let currentPlayer = 1;
 let scores = { 1: 0, 2: 0 };
 let totalBoxes = rows * cols;
