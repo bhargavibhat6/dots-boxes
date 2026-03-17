@@ -1,4 +1,4 @@
-const CACHE = 'dots-boxes-v1';
+const CACHE = 'dots-boxes-v2';
 const FILES = [
   './',
   './index.html',
